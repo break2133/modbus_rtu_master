@@ -48,16 +48,21 @@ typedef enum
 
 typedef struct
 {
-    mbrm_queue_status_t status;
     uint8_t slave_addr;
     uint8_t cmd;
     uint16_t register_addr;
     uint8_t len;
-    uint8_t repeat;
     uint8_t repeat_max;
     uint16_t over_time;
     uint8_t *data;
     void (*pop_sigingal)(uint8_t poped);
+} mbrm_unit_cfg_t;
+
+typedef struct
+{
+    uint8_t repeat;
+    mbrm_queue_status_t status;
+    mbrm_unit_cfg_t cfg;
 } mbrm_communication_unit_t;
 
 typedef struct
@@ -82,7 +87,7 @@ typedef struct
     mbrm_queue_t queue_tcb;
     uint16_t (*get_crc)(const uint8_t *, uint16_t);
     void (*pop_queue)(mbrm_queue_status_t);
-    uint8_t (*push_queue)(mbrm_communication_unit_t *q);
+    uint8_t (*push_queue)(mbrm_unit_cfg_t *q);
     void (*write_cb)(const uint8_t *, uint16_t);
     void (*mutex_lock)(void);
     void (*mutex_unlock)(void);
@@ -96,7 +101,7 @@ typedef struct
 
     /* PUBLIC */
     void (*init)(mbrm_init_cfg *);
-    uint8_t (*send_cmd)(mbrm_communication_unit_t *q);
+    uint8_t (*send_cmd)(mbrm_unit_cfg_t *q);
     void (*receive)(const uint8_t *, uint16_t);
     mbrm_protocol_status_t (*get_status)(void);
     const mbrm_communication_unit_t *(*get_unit_in_queue)(uint8_t);

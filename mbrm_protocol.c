@@ -166,9 +166,9 @@ static void _mbrm_pop_queue(mbrm_queue_status_t status)
         mbrm_tcb_priv->send_data(mbrm_tcb_priv->queue_tcb.pop_pos);
     }
 
-    if (mbrm_tcb_priv->queue_tcb.queue[poped].pop_sigingal != NULL)
+    if (mbrm_tcb_priv->queue_tcb.queue[poped].cfg.pop_sigingal != NULL)
     {
-        mbrm_tcb_priv->queue_tcb.queue[poped].pop_sigingal(poped);
+        mbrm_tcb_priv->queue_tcb.queue[poped].cfg.pop_sigingal(poped);
     }
 }
 
@@ -176,7 +176,7 @@ static void _mbrm_pop_queue(mbrm_queue_status_t status)
  * @brief
  * @param q
  */
-static uint8_t _mbrm_push_queue(mbrm_communication_unit_t *q)
+static uint8_t _mbrm_push_queue(mbrm_unit_cfg_t *q)
 {
     uint8_t pushed;
     uint8_t repeat_max;
@@ -187,11 +187,11 @@ static uint8_t _mbrm_push_queue(mbrm_communication_unit_t *q)
     }
     pushed = mbrm_tcb_priv->queue_tcb.push_pos;
     mbrm_log_i("Push queue at %d\r\n", pushed);
-    mbrm_tcb_priv->queue_tcb.queue[pushed] = *q;
+    mbrm_tcb_priv->queue_tcb.queue[pushed].cfg = *q;
     mbrm_tcb_priv->queue_tcb.queue[pushed].status = MBRM_QUEUE_STATUS_WAIT;
     mbrm_tcb_priv->queue_tcb.queue[pushed].repeat = 0;
-    repeat_max = mbrm_tcb_priv->queue_tcb.queue[pushed].repeat_max;
-    mbrm_tcb_priv->queue_tcb.queue[pushed].repeat_max = (repeat_max < 1 || repeat_max > 3) ? 3 : repeat_max;
+    repeat_max = mbrm_tcb_priv->queue_tcb.queue[pushed].cfg.repeat_max;
+    mbrm_tcb_priv->queue_tcb.queue[pushed].cfg.repeat_max = (repeat_max < 1 || repeat_max > 3) ? 3 : repeat_max;
     mbrm_tcb_priv->queue_tcb.push_pos++;
     mbrm_tcb_priv->queue_tcb.push_pos %= MBRM_COMMUNICATION_QUEUE_MAX_LENTH;
 
@@ -214,20 +214,20 @@ void _mbrm_send_data(uint8_t queue_pos)
     uint16_t send_data_lenth;
 
     unit->repeat++;
-    if (unit->repeat > unit->repeat_max)
+    if (unit->repeat > unit->cfg.repeat_max)
     {
         mbrm_tcb_priv->pop_queue(MBRM_QUEUE_STATUS_OVER_TIME);
     }
 
-    switch (unit->cmd)
+    switch (unit->cfg.cmd)
     {
     case 0x03:
-        mbrm_tcb_priv->send_buf[0] = unit->slave_addr;
-        mbrm_tcb_priv->send_buf[1] = unit->cmd;
-        mbrm_tcb_priv->send_buf[2] = unit->register_addr >> 8;
-        mbrm_tcb_priv->send_buf[3] = unit->register_addr & 0xff;
+        mbrm_tcb_priv->send_buf[0] = unit->cfg.slave_addr;
+        mbrm_tcb_priv->send_buf[1] = unit->cfg.cmd;
+        mbrm_tcb_priv->send_buf[2] = unit->cfg.register_addr >> 8;
+        mbrm_tcb_priv->send_buf[3] = unit->cfg.register_addr & 0xff;
         mbrm_tcb_priv->send_buf[4] = 0;
-        mbrm_tcb_priv->send_buf[5] = unit->len;
+        mbrm_tcb_priv->send_buf[5] = unit->cfg.len;
         crc_code = mbrm_tcb_priv->get_crc(mbrm_tcb_priv->send_buf, 6);
         mbrm_tcb_priv->send_buf[6] = crc_code;
         mbrm_tcb_priv->send_buf[7] = crc_code >> 8;
@@ -239,12 +239,12 @@ void _mbrm_send_data(uint8_t queue_pos)
         break;
 
     case 0x06:
-        mbrm_tcb_priv->send_buf[0] = unit->slave_addr;
-        mbrm_tcb_priv->send_buf[1] = unit->cmd;
-        mbrm_tcb_priv->send_buf[2] = unit->register_addr >> 8;
-        mbrm_tcb_priv->send_buf[3] = unit->register_addr & 0xff;
-        mbrm_tcb_priv->send_buf[4] = unit->data[0];
-        mbrm_tcb_priv->send_buf[5] = unit->data[1];
+        mbrm_tcb_priv->send_buf[0] = unit->cfg.slave_addr;
+        mbrm_tcb_priv->send_buf[1] = unit->cfg.cmd;
+        mbrm_tcb_priv->send_buf[2] = unit->cfg.register_addr >> 8;
+        mbrm_tcb_priv->send_buf[3] = unit->cfg.register_addr & 0xff;
+        mbrm_tcb_priv->send_buf[4] = unit->cfg.data[0];
+        mbrm_tcb_priv->send_buf[5] = unit->cfg.data[1];
         crc_code = mbrm_tcb_priv->get_crc(mbrm_tcb_priv->send_buf, 6);
         mbrm_tcb_priv->send_buf[6] = crc_code;
         mbrm_tcb_priv->send_buf[7] = crc_code >> 8;
@@ -256,17 +256,17 @@ void _mbrm_send_data(uint8_t queue_pos)
         break;
 
     case 0x10:
-        send_data_lenth = 7 + unit->len + 2;
-        mbrm_tcb_priv->send_buf[0] = unit->slave_addr;
-        mbrm_tcb_priv->send_buf[1] = unit->cmd;
-        mbrm_tcb_priv->send_buf[2] = unit->register_addr >> 8;
-        mbrm_tcb_priv->send_buf[3] = unit->register_addr & 0xff;
+        send_data_lenth = 7 + unit->cfg.len + 2;
+        mbrm_tcb_priv->send_buf[0] = unit->cfg.slave_addr;
+        mbrm_tcb_priv->send_buf[1] = unit->cfg.cmd;
+        mbrm_tcb_priv->send_buf[2] = unit->cfg.register_addr >> 8;
+        mbrm_tcb_priv->send_buf[3] = unit->cfg.register_addr & 0xff;
         mbrm_tcb_priv->send_buf[4] = 0;
-        mbrm_tcb_priv->send_buf[5] = unit->len / 2;
-        mbrm_tcb_priv->send_buf[6] = unit->len;
-        for (uint8_t i = 0; i < unit->len; i++)
+        mbrm_tcb_priv->send_buf[5] = unit->cfg.len / 2;
+        mbrm_tcb_priv->send_buf[6] = unit->cfg.len;
+        for (uint8_t i = 0; i < unit->cfg.len; i++)
         {
-            mbrm_tcb_priv->send_buf[7 + i] = unit->data[i];
+            mbrm_tcb_priv->send_buf[7 + i] = unit->cfg.data[i];
         }
         crc_code = mbrm_tcb_priv->get_crc(mbrm_tcb_priv->send_buf, send_data_lenth - 2);
         mbrm_tcb_priv->send_buf[send_data_lenth - 2] = crc_code & 0xff;
@@ -279,7 +279,7 @@ void _mbrm_send_data(uint8_t queue_pos)
         break;
 
     default:
-        mbrm_log_e("Unknown command: 0x%02x\r\n", unit->cmd);
+        mbrm_log_e("Unknown command: 0x%02x\r\n", unit->cfg.cmd);
         break;
     }
 }
@@ -294,7 +294,7 @@ static void _mbrm_receive(const uint8_t *data, uint16_t len)
     RUN_CB(mbrm_tcb_priv->mutex_lock);
 
     /* 1.Slave addr */
-    if (data[0] != mbrm_tcb_priv->queue_tcb.queue[mbrm_tcb_priv->queue_tcb.pop_pos].slave_addr)
+    if (data[0] != mbrm_tcb_priv->queue_tcb.queue[mbrm_tcb_priv->queue_tcb.pop_pos].cfg.slave_addr)
     {
         RUN_CB(mbrm_tcb_priv->mutex_unlock);
         return;
@@ -308,7 +308,7 @@ static void _mbrm_receive(const uint8_t *data, uint16_t len)
     }
 
     /* 3.Cmd */
-    if (data[1] != mbrm_tcb_priv->queue_tcb.queue[mbrm_tcb_priv->queue_tcb.pop_pos].cmd)
+    if (data[1] != mbrm_tcb_priv->queue_tcb.queue[mbrm_tcb_priv->queue_tcb.pop_pos].cfg.cmd)
     {
         mbrm_tcb_priv->pop_queue(MBRM_QUEUE_STATUS_ERROR);
         RUN_CB(mbrm_tcb_priv->mutex_unlock);
@@ -318,7 +318,7 @@ static void _mbrm_receive(const uint8_t *data, uint16_t len)
     switch (data[1])
     {
     case 0x03:
-        memcpy(mbrm_tcb_priv->queue_tcb.queue[mbrm_tcb_priv->queue_tcb.pop_pos].data, data + 3, len - 5);
+        memcpy(mbrm_tcb_priv->queue_tcb.queue[mbrm_tcb_priv->queue_tcb.pop_pos].cfg.data, data + 3, len - 5);
         break;
 
     case 0x06:
@@ -344,7 +344,7 @@ static void _mbrm_receive(const uint8_t *data, uint16_t len)
  * @param q
  * @return
  */
-static uint8_t _mbrm_send_cmd(mbrm_communication_unit_t *q)
+static uint8_t _mbrm_send_cmd(mbrm_unit_cfg_t *q)
 {
     uint8_t ret;
     RUN_CB(mbrm_tcb_priv->mutex_lock);
