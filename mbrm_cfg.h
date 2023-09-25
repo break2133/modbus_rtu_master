@@ -54,7 +54,14 @@
  */
 #define MBRM_COMMUNICATION_QUEUE_MAX_LENTH 5
 
+/**
+ * Maximum of slave device(def: 5).
+ */
+#define MBRM_DEVICE_MAX_NUM 5
 
-
+/**
+ * Length of slave device's name(def: 5).
+ */
+#define MBRM_DEVICE_NAME_LENTH 5
 
 #endif /* _MODBUS_RTU_MASTER_MBRM_CFG_H_ */

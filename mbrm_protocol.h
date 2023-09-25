@@ -56,6 +56,7 @@ typedef struct
     uint16_t over_time;
     uint8_t *data;
     void (*pop_sigingal)(uint8_t poped);
+    void *user_param;
 } mbrm_unit_cfg_t;
 
 typedef struct
@@ -78,6 +79,10 @@ typedef struct
     void (*write_cb)(const uint8_t *, uint16_t);
     void (*mutex_lock)(void);
     void (*mutex_unlock)(void);
+    void (*timer_start_cb)(uint16_t over_time);
+    void (*timer_stop_cb)(void);
+    void *(*malloc_hock)(size_t size);
+    void (*free_hock)(void *ptr);
 } mbrm_init_cfg;
 
 typedef struct
@@ -91,6 +96,8 @@ typedef struct
     void (*write_cb)(const uint8_t *, uint16_t);
     void (*mutex_lock)(void);
     void (*mutex_unlock)(void);
+    void (*timer_start_cb)(uint16_t over_time);
+    void (*timer_stop_cb)(void);
     void (*send_data)(uint8_t);
 } mbrm_protocol_private_t;
 
@@ -100,9 +107,10 @@ typedef struct
     char priv[sizeof(mbrm_protocol_private_t)];
 
     /* PUBLIC */
-    void (*init)(mbrm_init_cfg *);
+    void (*init)(const mbrm_init_cfg *);
     uint8_t (*send_cmd)(mbrm_unit_cfg_t *q);
     void (*receive)(const uint8_t *, uint16_t);
+    void (*timer_over)(void);
     mbrm_protocol_status_t (*get_status)(void);
     const mbrm_communication_unit_t *(*get_unit_in_queue)(uint8_t);
 } mbrm_protocol_t;
