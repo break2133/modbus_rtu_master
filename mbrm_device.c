@@ -175,8 +175,8 @@ static void _mbrm_dev_pop_sigingal(uint8_t poped)
         case MBRM_DEV_16_12:
             for (i = 0; i < cmd_info->pcmd->num; i++)
             {
-                read_data[i] = data_16->data8[1];
-                read_data[i + 1] = data_16->data8[0];
+                read_data[i * 2] = data_16->data8[1];
+                read_data[i * 2 + 1] = data_16->data8[0];
                 data_16++;
             }
             break;
@@ -195,30 +195,30 @@ static void _mbrm_dev_pop_sigingal(uint8_t poped)
         case MBRM_DEV_32_1234:
             for (i = 0; i < cmd_info->pcmd->num; i++)
             {
-                read_data[i] = data_32->data8[3];
-                read_data[i + 1] = data_32->data8[2];
-                read_data[i + 2] = data_32->data8[1];
-                read_data[i + 3] = data_32->data8[0];
+                read_data[i * 4] = data_32->data8[3];
+                read_data[i * 4 + 1] = data_32->data8[2];
+                read_data[i * 4 + 2] = data_32->data8[1];
+                read_data[i * 4 + 3] = data_32->data8[0];
                 data_32++;
             }
             break;
         case MBRM_DEV_32_2143:
             for (i = 0; i < cmd_info->pcmd->num; i++)
             {
-                read_data[i] = data_32->data8[2];
-                read_data[i + 1] = data_32->data8[3];
-                read_data[i + 2] = data_32->data8[0];
-                read_data[i + 3] = data_32->data8[1];
+                read_data[i * 4] = data_32->data8[2];
+                read_data[i * 4 + 1] = data_32->data8[3];
+                read_data[i * 4 + 2] = data_32->data8[0];
+                read_data[i * 4 + 3] = data_32->data8[1];
                 data_32++;
             }
             break;
         case MBRM_DEV_32_3412:
             for (i = 0; i < cmd_info->pcmd->num; i++)
             {
-                read_data[i] = data_32->data8[1];
-                read_data[i + 1] = data_32->data8[0];
-                read_data[i + 2] = data_32->data8[3];
-                read_data[i + 3] = data_32->data8[2];
+                read_data[i * 4] = data_32->data8[1];
+                read_data[i * 4 + 1] = data_32->data8[0];
+                read_data[i * 4 + 2] = data_32->data8[3];
+                read_data[i * 4 + 3] = data_32->data8[2];
                 data_32++;
             }
             break;
@@ -274,12 +274,12 @@ static void _mbrm_dev_send_protocol(mbrm_device_cmd_info_t *cmd_info)
             switch (pdev->info.mode_16)
             {
             case MBRM_DEV_16_12:
-                buf[i] = send_data16->data8[0];
-                buf[i + 1] = send_data16->data8[1];
+                buf[i * 2] = send_data16->data8[0];
+                buf[i * 2 + 1] = send_data16->data8[1];
                 break;
             case MBRM_DEV_16_21:
-                buf[i] = send_data16->data8[1];
-                buf[i + 1] = send_data16->data8[0];
+                buf[i * 2] = send_data16->data8[1];
+                buf[i * 2 + 1] = send_data16->data8[0];
                 break;
             default:
                 break;
@@ -298,29 +298,29 @@ static void _mbrm_dev_send_protocol(mbrm_device_cmd_info_t *cmd_info)
             switch (pdev->info.mode_32)
             {
             case MBRM_DEV_32_1234:
-                buf[i] = send_data32->data8[3];
-                buf[i + 1] = send_data32->data8[2];
-                buf[i + 2] = send_data32->data8[1];
-                buf[i + 3] = send_data32->data8[0];
+                buf[i * 4] = send_data32->data8[3];
+                buf[i * 4 + 1] = send_data32->data8[2];
+                buf[i * 4 + 2] = send_data32->data8[1];
+                buf[i * 4 + 3] = send_data32->data8[0];
                 break;
             case MBRM_DEV_32_2143:
-                buf[i] = send_data32->data8[2];
-                buf[i + 1] = send_data32->data8[3];
-                buf[i + 2] = send_data32->data8[0];
-                buf[i + 3] = send_data32->data8[1];
+                buf[i * 4] = send_data32->data8[2];
+                buf[i * 4 + 1] = send_data32->data8[3];
+                buf[i * 4 + 2] = send_data32->data8[0];
+                buf[i * 4 + 3] = send_data32->data8[1];
                 break;
             case MBRM_DEV_32_3412:
-                buf[i] = send_data32->data8[1];
-                buf[i + 1] = send_data32->data8[0];
-                buf[i + 2] = send_data32->data8[3];
-                buf[i + 3] = send_data32->data8[2];
+                buf[i * 4] = send_data32->data8[1];
+                buf[i * 4 + 1] = send_data32->data8[0];
+                buf[i * 4 + 2] = send_data32->data8[3];
+                buf[i * 4 + 3] = send_data32->data8[2];
                 break;
 
             case MBRM_DEV_32_4321:
-                buf[i] = send_data32->data8[0];
-                buf[i + 1] = send_data32->data8[1];
-                buf[i + 2] = send_data32->data8[2];
-                buf[i + 3] = send_data32->data8[3];
+                buf[i * 4] = send_data32->data8[0];
+                buf[i * 4 + 1] = send_data32->data8[1];
+                buf[i * 4 + 2] = send_data32->data8[2];
+                buf[i * 4 + 3] = send_data32->data8[3];
                 break;
             default:
                 break;
