@@ -18,6 +18,6 @@
 
 ## 资源占用情况
 
-|Flash|RAM|
+|ROM|RAM|
 |-|-|
-|<1.5KByte|<0.5KByte|
+|<3.5KByte|<1.0KByte|
