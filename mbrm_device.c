@@ -274,12 +274,12 @@ static void _mbrm_dev_send_protocol(mbrm_device_cmd_info_t *cmd_info)
             switch (pdev->info.mode_16)
             {
             case MBRM_DEV_16_12:
-                buf[i * 2] = send_data16->data8[0];
-                buf[i * 2 + 1] = send_data16->data8[1];
-                break;
-            case MBRM_DEV_16_21:
                 buf[i * 2] = send_data16->data8[1];
                 buf[i * 2 + 1] = send_data16->data8[0];
+                break;
+            case MBRM_DEV_16_21:
+                buf[i * 2] = send_data16->data8[0];
+                buf[i * 2 + 1] = send_data16->data8[1];
                 break;
             default:
                 break;
