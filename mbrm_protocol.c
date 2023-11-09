@@ -89,9 +89,9 @@ static const uint8_t auchCRCLo[] =
  */
 static uint16_t _mbrm_get_crc_code(const uint8_t *puchMsg, uint16_t usDataLen)
 {
-    unsigned uint8_t uchCRCHi = 0xFF;
-    unsigned uint8_t uchCRCLo = 0xFF;
-    unsigned uIndex;
+    uint8_t uchCRCHi = 0xFF;
+    uint8_t uchCRCLo = 0xFF;
+    uint8_t uIndex;
 
     while (usDataLen--)
     {
@@ -99,7 +99,7 @@ static uint16_t _mbrm_get_crc_code(const uint8_t *puchMsg, uint16_t usDataLen)
         uchCRCHi = uchCRCLo ^ auchCRCHi[uIndex];
         uchCRCLo = auchCRCLo[uIndex];
     }
-    return (uchCRCHi << 8 | uchCRCLo);
+    return (uchCRCHi | uchCRCLo << 8);
 }
 #else
 /**
@@ -209,6 +209,8 @@ static uint8_t _mbrm_push_queue(mbrm_unit_cfg_t *q)
     {
         mbrm_tcb_priv->status = MBRM_PROTOCOL_STATUS_BUSY;
     }
+
+    return 0;
 }
 
 /**
