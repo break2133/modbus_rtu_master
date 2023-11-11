@@ -249,7 +249,7 @@ complete:
 
     if (cmd_info->complete_cb != NULL)
     {
-        cmd_info->complete_cb(unit->status);
+        cmd_info->complete_cb(unit->status, cmd_info->pcmd->data);
         cmd_info->complete_cb = NULL;
     }
     mbrm_dev_priv->free_hock(unit->cfg.data);
@@ -353,7 +353,7 @@ static void _mbrm_dev_send_protocol(mbrm_device_cmd_info_t *cmd_info)
  * @param
  * @return 0 Succeed; -1: parameter err; 1: Target not found; 2: Memory alloc fail.
  */
-static int _mbrm_dev_send_cmd(char *name, int cmd, void(*complete_cb)(mbrm_queue_status_t status))
+static int _mbrm_dev_send_cmd(char *name, int cmd, void(*complete_cb)(mbrm_queue_status_t status, void *data))
 {
     if (name == NULL)
     {
@@ -411,12 +411,52 @@ static void _mbrm_dev_init(const mbrm_init_cfg *cfg)
     }
 }
 
+static int _mbrm_dev_set_data(char *name, int cmd, void *data)
+{
+    if (name == NULL)
+    {
+        mbrm_log_e("dev_set_data: parameter err.\r\n");
+        return -1;
+    }
+    if (mbrm_dev_priv->devs == NULL)
+    {
+        mbrm_log_w("dev_set_data: Target not found.\r\n");
+        return 1;
+    }
+
+    mbrm_device_t *pdev = mbrm_dev_priv->devs;
+    do
+    {
+        if (strncmp(pdev->info.name, name, MBRM_DEVICE_NAME_LENTH) == 0)
+        {
+            mbrm_device_cmd_t *pcmd = &pdev->info.cmd_list[cmd];
+
+            if (pcmd->type == MBRM_TYPE_16)
+            {
+                memcpy(pcmd->data, data, pcmd->num * 2);
+            }
+            else
+            {
+                memcpy(pcmd->data, data, pcmd->num * 4);
+            }
+
+            return 0;
+        }
+        pdev = pdev->next;
+    }
+    while (pdev != mbrm_dev_priv->devs);
+
+    mbrm_log_w("dev_set_data: Target not found.\r\n");
+    return 1;
+}
+
 static mbrm_device_class_t mbrm_dev =
 {
     .init = _mbrm_dev_init,
     .dev_detach = _mbrm_dev_detach,
     .dev_register = _mbrm_dev_register,
     .dev_send_cmd = _mbrm_dev_send_cmd,
+    .dev_set_data = _mbrm_dev_set_data,
 };
 
 const mbrm_device_class_t *get_mbrm_devive_obj(void)

@@ -31,7 +31,7 @@
 /**
  * Switch of log(def = CLOSE).
  */
-#define MBRM_LOG_SWITCH 1
+#define MBRM_LOG_SWITCH 0
 #if MBRM_LOG_SWITCH
     #define mbrm_log_i(...) printf(__VA_ARGS__)
     #define mbrm_log_w(...) printf(__VA_ARGS__)
@@ -47,7 +47,7 @@
  * 0(def): Look-Up Table
  * other: Calculation
  */
-#define MBRM_CRC_CODE_MODE 1
+#define MBRM_CRC_CODE_MODE 0
 
 /**
  * Maximum length of communication queue(def: 5; max: 254).

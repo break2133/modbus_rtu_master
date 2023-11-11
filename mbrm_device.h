@@ -93,7 +93,7 @@ typedef struct
 {
     mbrm_device_t *pdev;
     mbrm_device_cmd_t *pcmd;
-    void(*complete_cb)(mbrm_queue_status_t status);
+    void(*complete_cb)(mbrm_queue_status_t status, void *data);
 } mbrm_device_cmd_info_t;
 
 typedef struct
@@ -118,7 +118,8 @@ typedef struct
     void (*init)(const mbrm_init_cfg *cfg);
     int (*dev_register)(mbrm_device_info_t *info);
     int (*dev_detach)(char *name);
-    int (*dev_send_cmd)(char *name, int cmd, void(*complete_cb)(mbrm_queue_status_t status));
+    int (*dev_send_cmd)(char *name, int cmd, void(*complete_cb)(mbrm_queue_status_t status, void *data));
+    int (*dev_set_data)(char *name, int cmd, void *data);
 } mbrm_device_class_t;
 
 const mbrm_device_class_t *get_mbrm_devive_obj(void);
